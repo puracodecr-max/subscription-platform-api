@@ -1,0 +1,405 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Guia de Uso - Subscription Platform y CRM</title>
+  <style>
+    @page { size: A4; margin: 16mm; }
+    :root {
+      --ink: #101828;
+      --muted: #667085;
+      --line: #d0d5dd;
+      --soft: #f2f4f7;
+      --blue: #2563eb;
+      --blue-soft: #dbeafe;
+      --green: #16a34a;
+      --green-soft: #dcfce7;
+      --amber: #d97706;
+      --amber-soft: #fef3c7;
+      --red: #dc2626;
+      --red-soft: #fee2e2;
+      --purple: #7c3aed;
+      --purple-soft: #ede9fe;
+    }
+    * { box-sizing: border-box; }
+    body {
+      color: var(--ink);
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 12.5px;
+      line-height: 1.45;
+      margin: 0;
+      background: #fff;
+    }
+    h1, h2, h3 { line-height: 1.15; margin: 0 0 10px; }
+    h1 { font-size: 31px; letter-spacing: -0.04em; }
+    h2 { font-size: 21px; margin-top: 26px; }
+    h3 { font-size: 15px; margin-top: 14px; }
+    p { margin: 0 0 10px; }
+    ul, ol { margin: 8px 0 12px 20px; padding: 0; }
+    li { margin: 4px 0; }
+    code {
+      background: var(--soft);
+      border: 1px solid #e4e7ec;
+      border-radius: 4px;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 11px;
+      padding: 1px 4px;
+    }
+    pre {
+      background: #0f172a;
+      border-radius: 10px;
+      color: #e2e8f0;
+      font-family: Consolas, "Courier New", monospace;
+      font-size: 10.5px;
+      line-height: 1.45;
+      margin: 10px 0 14px;
+      overflow: hidden;
+      padding: 12px;
+      white-space: pre-wrap;
+    }
+    .cover {
+      background: linear-gradient(135deg, #101828 0%, #1d4ed8 100%);
+      border-radius: 20px;
+      color: #fff;
+      margin-bottom: 22px;
+      padding: 30px;
+    }
+    .cover p { color: #dbeafe; font-size: 14px; max-width: 680px; }
+    .tag {
+      background: rgba(255, 255, 255, 0.16);
+      border-radius: 999px;
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      margin-bottom: 14px;
+      padding: 7px 10px;
+      text-transform: uppercase;
+    }
+    .note, .warning, .success {
+      border-radius: 12px;
+      margin: 12px 0;
+      padding: 12px 14px;
+    }
+    .note { background: var(--blue-soft); border: 1px solid #93c5fd; }
+    .warning { background: var(--amber-soft); border: 1px solid #fbbf24; }
+    .success { background: var(--green-soft); border: 1px solid #86efac; }
+    .grid-2 { display: grid; gap: 12px; grid-template-columns: 1fr 1fr; }
+    .card {
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      margin: 10px 0;
+      padding: 14px;
+    }
+    .card h3 { margin-top: 0; }
+    .muted { color: var(--muted); }
+    .pill {
+      border-radius: 999px;
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 700;
+      margin: 2px 3px 2px 0;
+      padding: 3px 7px;
+    }
+    .pill.blue { background: var(--blue-soft); color: #1e3a8a; }
+    .pill.green { background: var(--green-soft); color: #166534; }
+    .pill.red { background: var(--red-soft); color: #991b1b; }
+    .pill.purple { background: var(--purple-soft); color: #4c1d95; }
+    table { border-collapse: collapse; margin: 10px 0 14px; width: 100%; }
+    th, td { border: 1px solid var(--line); padding: 7px 8px; text-align: left; vertical-align: top; }
+    th { background: #f8fafc; font-size: 11px; text-transform: uppercase; }
+    .page-break { break-before: page; }
+    svg { display: block; margin: 10px 0 16px; max-width: 100%; }
+    .small { font-size: 11px; }
+  </style>
+</head>
+<body>
+  <section class="cover">
+    <span class="tag">Guia ilustrada</span>
+    <h1>Como usar Subscription Platform con una app como el CRM</h1>
+    <p>Esta guia explica desde cero como configurar una aplicacion, crear planes, asignar suscripciones, generar un Service Token y usarlo para que el CRM pueda permitir o bloquear acceso.</p>
+    <p class="small">Archivo generado para: <strong>subscription-platform</strong>. No contiene passwords ni tokens reales.</p>
+  </section>
+
+  <h2>1. Idea general</h2>
+  <p><strong>Subscription Platform</strong> es el sistema central que decide si un cliente puede usar una aplicacion o un modulo. El CRM sigue siendo el CRM; esta plataforma solo le responde si debe permitir o bloquear acceso.</p>
+
+  <svg viewBox="0 0 920 300" role="img" aria-label="Arquitectura general">
+    <defs>
+      <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#475467" />
+      </marker>
+    </defs>
+    <rect x="25" y="30" width="190" height="70" rx="14" fill="#dbeafe" stroke="#2563eb" />
+    <text x="120" y="62" text-anchor="middle" font-weight="700" fill="#1e3a8a">Admin Web</text>
+    <text x="120" y="82" text-anchor="middle" font-size="12" fill="#1e3a8a">gestiona clientes y planes</text>
+
+    <rect x="360" y="30" width="200" height="70" rx="14" fill="#ede9fe" stroke="#7c3aed" />
+    <text x="460" y="62" text-anchor="middle" font-weight="700" fill="#4c1d95">subscription-api</text>
+    <text x="460" y="82" text-anchor="middle" font-size="12" fill="#4c1d95">reglas, pagos y acceso</text>
+
+    <rect x="690" y="30" width="190" height="70" rx="14" fill="#dcfce7" stroke="#16a34a" />
+    <text x="785" y="62" text-anchor="middle" font-weight="700" fill="#166534">BD propia</text>
+    <text x="785" y="82" text-anchor="middle" font-size="12" fill="#166534">schema adm</text>
+
+    <rect x="25" y="190" width="190" height="70" rx="14" fill="#fef3c7" stroke="#d97706" />
+    <text x="120" y="222" text-anchor="middle" font-weight="700" fill="#92400e">CRM_API_SERVER</text>
+    <text x="120" y="242" text-anchor="middle" font-size="12" fill="#92400e">backend existente</text>
+
+    <rect x="360" y="190" width="200" height="70" rx="14" fill="#fee2e2" stroke="#dc2626" />
+    <text x="460" y="222" text-anchor="middle" font-weight="700" fill="#991b1b">validateEntitlement</text>
+    <text x="460" y="242" text-anchor="middle" font-size="12" fill="#991b1b">allowed true/false</text>
+
+    <line x1="215" y1="65" x2="360" y2="65" stroke="#475467" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="560" y1="65" x2="690" y2="65" stroke="#475467" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="215" y1="225" x2="360" y2="225" stroke="#475467" stroke-width="2" marker-end="url(#arrow)" />
+    <line x1="460" y1="190" x2="460" y2="100" stroke="#475467" stroke-width="2" marker-end="url(#arrow)" />
+  </svg>
+
+  <div class="note">
+    <strong>Regla importante:</strong> El CRM no debe leer tablas <code>adm</code> directamente. Debe preguntar a <code>subscription-api</code> usando el endpoint de validacion o el SDK.
+  </div>
+
+  <h2>2. Que modulos se usan para configurar el CRM</h2>
+  <table>
+    <thead><tr><th>Modulo</th><th>Para que sirve</th><th>Ejemplo CRM</th></tr></thead>
+    <tbody>
+      <tr><td>Aplicaciones</td><td>Define el producto que sera controlado.</td><td>Crear aplicacion <code>CRM</code>.</td></tr>
+      <tr><td>Planes</td><td>Define precio, frecuencia y reglas de mora.</td><td>Plan Basico, Pro, Enterprise.</td></tr>
+      <tr><td>Clientes</td><td>Registra la empresa/persona que compra.</td><td>Cliente: Hotel Demo S.A.</td></tr>
+      <tr><td>Suscripciones</td><td>Une cliente + aplicacion + plan.</td><td>Hotel Demo usa CRM Pro.</td></tr>
+      <tr><td>Facturas y Pagos</td><td>Controla deuda y estado financiero.</td><td>Factura mensual del CRM.</td></tr>
+      <tr><td>Service Tokens</td><td>Credencial para que el CRM pregunte por acceso.</td><td>Token guardado en <code>CRM_API_SERVER/.env</code>.</td></tr>
+      <tr><td>Accesos</td><td>Prueba manual de la validacion.</td><td>Ver si Hotel Demo puede entrar al CRM.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-break"></div>
+  <h2>3. Paso a paso: configurar el CRM en el admin</h2>
+
+  <svg viewBox="0 0 920 250" role="img" aria-label="Pasos de configuracion">
+    <defs>
+      <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#475467" />
+      </marker>
+    </defs>
+    <g font-size="12">
+      <rect x="10" y="60" width="125" height="76" rx="12" fill="#dbeafe" stroke="#2563eb" />
+      <text x="72" y="88" text-anchor="middle" font-weight="700">1. App</text>
+      <text x="72" y="108" text-anchor="middle">CRM</text>
+      <line x1="135" y1="98" x2="165" y2="98" stroke="#475467" stroke-width="2" marker-end="url(#arrow2)" />
+
+      <rect x="165" y="60" width="125" height="76" rx="12" fill="#ede9fe" stroke="#7c3aed" />
+      <text x="228" y="88" text-anchor="middle" font-weight="700">2. Plan</text>
+      <text x="228" y="108" text-anchor="middle">CRM_PRO</text>
+      <line x1="290" y1="98" x2="320" y2="98" stroke="#475467" stroke-width="2" marker-end="url(#arrow2)" />
+
+      <rect x="320" y="60" width="125" height="76" rx="12" fill="#dcfce7" stroke="#16a34a" />
+      <text x="382" y="88" text-anchor="middle" font-weight="700">3. Cliente</text>
+      <text x="382" y="108" text-anchor="middle">Hotel Demo</text>
+      <line x1="445" y1="98" x2="475" y2="98" stroke="#475467" stroke-width="2" marker-end="url(#arrow2)" />
+
+      <rect x="475" y="60" width="135" height="76" rx="12" fill="#fef3c7" stroke="#d97706" />
+      <text x="542" y="88" text-anchor="middle" font-weight="700">4. Suscripcion</text>
+      <text x="542" y="108" text-anchor="middle">Cliente + Plan</text>
+      <line x1="610" y1="98" x2="640" y2="98" stroke="#475467" stroke-width="2" marker-end="url(#arrow2)" />
+
+      <rect x="640" y="60" width="125" height="76" rx="12" fill="#fee2e2" stroke="#dc2626" />
+      <text x="702" y="88" text-anchor="middle" font-weight="700">5. Token</text>
+      <text x="702" y="108" text-anchor="middle">sat_xxx</text>
+      <line x1="765" y1="98" x2="795" y2="98" stroke="#475467" stroke-width="2" marker-end="url(#arrow2)" />
+
+      <rect x="795" y="60" width="115" height="76" rx="12" fill="#e0f2fe" stroke="#0284c7" />
+      <text x="852" y="88" text-anchor="middle" font-weight="700">6. CRM</text>
+      <text x="852" y="108" text-anchor="middle">validar acceso</text>
+    </g>
+  </svg>
+
+  <h3>Paso 1 - Crear aplicacion CRM</h3>
+  <ol>
+    <li>Entrar al admin web.</li>
+    <li>Ir a <code>Aplicaciones</code>.</li>
+    <li>Crear una aplicacion con codigo <code>CRM</code>.</li>
+    <li>Agregar modulos separados por coma, por ejemplo: <code>dashboard, customers, invoices, payments</code>.</li>
+  </ol>
+
+  <h3>Paso 2 - Crear plan</h3>
+  <ol>
+    <li>Ir a <code>Planes</code>.</li>
+    <li>Seleccionar la aplicacion <code>CRM</code>.</li>
+    <li>Crear un plan, por ejemplo <code>CRM_PRO</code>.</li>
+    <li>Definir precio, moneda, frecuencia, dias de gracia y dias para suspension.</li>
+  </ol>
+
+  <h3>Paso 3 - Crear cliente</h3>
+  <ol>
+    <li>Ir a <code>Clientes</code>.</li>
+    <li>Crear el cliente con razon social, nombre visible y email.</li>
+    <li>Dejar <code>Suspension global = No</code> si el cliente puede operar.</li>
+  </ol>
+
+  <h3>Paso 4 - Crear suscripcion</h3>
+  <ol>
+    <li>Ir a <code>Suscripciones</code>.</li>
+    <li>Seleccionar cliente, aplicacion <code>CRM</code> y plan.</li>
+    <li>Definir fecha de inicio, proxima factura y dia de facturacion.</li>
+    <li>Usar estado <code>ACTIVE</code> si el cliente ya puede entrar.</li>
+  </ol>
+
+  <div class="page-break"></div>
+  <h2>4. Crear Service Token para el CRM</h2>
+  <p>El Service Token es la credencial que usara el backend del CRM para consultar <code>POST /api/v1/entitlements/validate</code>.</p>
+
+  <div class="warning">
+    <strong>Muy importante:</strong> El token plano solo se muestra una vez al crearlo. Si se pierde, hay que revocarlo y crear uno nuevo. En base de datos solo queda el hash.
+  </div>
+
+  <ol>
+    <li>Ir a <code>Service Tokens</code>.</li>
+    <li>Seleccionar aplicacion <code>CRM</code>, o dejar <code>Global</code> si el token servira para varias apps.</li>
+    <li>Nombre sugerido: <code>CRM local dev token</code> o <code>CRM production token</code>.</li>
+    <li>Scopes: <code>entitlements.validate</code>.</li>
+    <li>Crear token y copiar el valor que inicia con <code>sat_</code>.</li>
+  </ol>
+
+  <h3>Variables recomendadas en CRM_API_SERVER</h3>
+  <pre>SUBSCRIPTION_API_URL=http://localhost:3000/api/v1
+SUBSCRIPTION_SERVICE_TOKEN=sat_xxxxxxxxxxxxxxxxx</pre>
+
+  <h2>5. Como el CRM valida acceso</h2>
+  <p>El CRM debe validar acceso despues del login y tambien al entrar a modulos importantes. La validacion no reemplaza el login del CRM; solo decide si la suscripcion permite usar el sistema.</p>
+
+  <svg viewBox="0 0 900 355" role="img" aria-label="Flujo de validacion de acceso">
+    <defs>
+      <marker id="arrow3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+        <path d="M 0 0 L 10 5 L 0 10 z" fill="#475467" />
+      </marker>
+    </defs>
+    <rect x="35" y="35" width="170" height="62" rx="12" fill="#dbeafe" stroke="#2563eb" />
+    <text x="120" y="63" text-anchor="middle" font-weight="700">Usuario entra</text>
+    <text x="120" y="82" text-anchor="middle" font-size="12">CRM frontend</text>
+    <line x1="205" y1="66" x2="265" y2="66" stroke="#475467" stroke-width="2" marker-end="url(#arrow3)" />
+
+    <rect x="265" y="35" width="190" height="62" rx="12" fill="#fef3c7" stroke="#d97706" />
+    <text x="360" y="63" text-anchor="middle" font-weight="700">Login CRM</text>
+    <text x="360" y="82" text-anchor="middle" font-size="12">credenciales normales</text>
+    <line x1="455" y1="66" x2="515" y2="66" stroke="#475467" stroke-width="2" marker-end="url(#arrow3)" />
+
+    <rect x="515" y="35" width="210" height="62" rx="12" fill="#ede9fe" stroke="#7c3aed" />
+    <text x="620" y="63" text-anchor="middle" font-weight="700">CRM llama validate</text>
+    <text x="620" y="82" text-anchor="middle" font-size="12">service token</text>
+    <line x1="620" y1="97" x2="620" y2="145" stroke="#475467" stroke-width="2" marker-end="url(#arrow3)" />
+
+    <polygon points="620,145 735,205 620,265 505,205" fill="#fff7ed" stroke="#d97706" />
+    <text x="620" y="198" text-anchor="middle" font-weight="700">allowed?</text>
+    <text x="620" y="218" text-anchor="middle" font-size="12">true / false</text>
+
+    <line x1="505" y1="205" x2="300" y2="205" stroke="#475467" stroke-width="2" marker-end="url(#arrow3)" />
+    <rect x="90" y="174" width="210" height="62" rx="12" fill="#fee2e2" stroke="#dc2626" />
+    <text x="195" y="202" text-anchor="middle" font-weight="700">Bloquear</text>
+    <text x="195" y="221" text-anchor="middle" font-size="12">HTTP 403 o pantalla pago</text>
+
+    <line x1="735" y1="205" x2="790" y2="205" stroke="#475467" stroke-width="2" marker-end="url(#arrow3)" />
+    <rect x="790" y="174" width="90" height="62" rx="12" fill="#dcfce7" stroke="#16a34a" />
+    <text x="835" y="202" text-anchor="middle" font-weight="700">Permitir</text>
+    <text x="835" y="221" text-anchor="middle" font-size="12">continuar</text>
+
+    <text x="410" y="196" text-anchor="middle" font-size="12" fill="#991b1b">false</text>
+    <text x="765" y="196" text-anchor="middle" font-size="12" fill="#166534">true</text>
+  </svg>
+
+  <h3>Ejemplo de llamada HTTP</h3>
+  <pre>POST http://localhost:3000/api/v1/entitlements/validate
+Authorization: Bearer sat_xxxxxxxxxxxxx
+Content-Type: application/json
+
+{
+  "customerId": "UUID_DEL_CLIENTE",
+  "applicationCode": "CRM",
+  "requestedModule": "dashboard"
+}</pre>
+
+  <h3>Respuesta permitida</h3>
+  <pre>{
+  "success": true,
+  "data": {
+    "allowed": true,
+    "reason": null,
+    "subscriptionStatus": "ACTIVE"
+  }
+}</pre>
+
+  <h3>Respuesta bloqueada</h3>
+  <pre>{
+  "success": true,
+  "data": {
+    "allowed": false,
+    "reason": "PAYMENT_OVERDUE",
+    "subscriptionStatus": "SUSPENDED"
+  }
+}</pre>
+
+  <div class="page-break"></div>
+  <h2>6. Como bloquear o reactivar acceso desde el admin</h2>
+
+  <div class="grid-2">
+    <div class="card">
+      <h3>Bloqueo manual</h3>
+      <p>Ir a <code>Suscripciones</code> y presionar <code>Suspender</code>. Desde ese momento, la validacion debe devolver <code>allowed: false</code>.</p>
+      <span class="pill red">SUSPENDED</span>
+      <span class="pill red">ADMINISTRATIVE</span>
+    </div>
+    <div class="card">
+      <h3>Reactivacion</h3>
+      <p>Ir a <code>Suscripciones</code> y presionar <code>Reactivar</code>. Si la suscripcion vuelve a estar activa, el CRM puede permitir acceso.</p>
+      <span class="pill green">ACTIVE</span>
+      <span class="pill green">allowed true</span>
+    </div>
+    <div class="card">
+      <h3>Bloqueo por pago</h3>
+      <p>Si hay facturas vencidas y reglas de suspension, la validacion puede bloquear por deuda o mora.</p>
+      <span class="pill red">PAYMENT_OVERDUE</span>
+      <span class="pill red">OUTSTANDING_BALANCE</span>
+    </div>
+    <div class="card">
+      <h3>Prorroga</h3>
+      <p>Desde <code>Prorrogas</code> puedes extender el vencimiento de una factura y, si aplica, reactivar al cliente.</p>
+      <span class="pill blue">EXTENSION</span>
+      <span class="pill green">GRACE</span>
+    </div>
+  </div>
+
+  <h2>7. Orden recomendado para una prueba completa</h2>
+  <ol>
+    <li>Levantar <code>subscription-api</code> con <code>npm run dev</code>.</li>
+    <li>Levantar <code>subscription-admin-web</code> con <code>npm run dev</code>.</li>
+    <li>Iniciar sesion con el admin.</li>
+    <li>Crear aplicacion <code>CRM</code>.</li>
+    <li>Crear plan <code>CRM_PRO</code>.</li>
+    <li>Crear cliente de prueba.</li>
+    <li>Crear suscripcion activa.</li>
+    <li>Crear Service Token para <code>CRM</code>.</li>
+    <li>Ir a <code>Accesos</code> y probar la validacion con el Service Token.</li>
+    <li>Suspender la suscripcion y repetir la validacion. Debe negar acceso.</li>
+    <li>Reactivar la suscripcion y repetir la validacion. Debe permitir acceso.</li>
+  </ol>
+
+  <h2>8. Checklist para integrar CRM_API_SERVER</h2>
+  <table>
+    <thead><tr><th>Checklist</th><th>Estado esperado</th></tr></thead>
+    <tbody>
+      <tr><td>Variable <code>SUBSCRIPTION_API_URL</code></td><td>Apunta a <code>subscription-api</code>.</td></tr>
+      <tr><td>Variable <code>SUBSCRIPTION_SERVICE_TOKEN</code></td><td>Token generado desde el admin.</td></tr>
+      <tr><td>CRM conoce <code>customerId</code></td><td>Debe mapear usuario/empresa CRM con cliente en subscriptions.</td></tr>
+      <tr><td>CRM usa <code>applicationCode=CRM</code></td><td>Debe coincidir con el codigo de la aplicacion creada.</td></tr>
+      <tr><td>Middleware de validacion</td><td>Antes de rutas protegidas o modulos criticos.</td></tr>
+      <tr><td>Manejo de bloqueo</td><td>Responder 403 o mostrar pantalla de pago/suscripcion.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="success">
+    <strong>Resumen:</strong> Para controlar el CRM desde esta plataforma, configura aplicacion + plan + cliente + suscripcion + service token. Luego el CRM pregunta a <code>validateEntitlement</code> cada vez que necesite confirmar acceso.
+  </div>
+</body>
+</html>

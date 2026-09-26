@@ -1,0 +1,45 @@
+erDiagram
+  USERS ||--o{ USER_ROLES : has
+  ROLES ||--o{ USER_ROLES : assigned
+  ROLES ||--o{ ROLE_PERMISSIONS : grants
+  PERMISSIONS ||--o{ ROLE_PERMISSIONS : granted
+
+  CUSTOMERS ||--o{ TENANTS : owns
+  CUSTOMERS ||--o{ BRANCHES : owns
+  TENANTS ||--o{ BRANCHES : groups
+  CUSTOMERS ||--o{ CUSTOMER_CONTACTS : has
+
+  APPLICATIONS ||--o{ PLANS : offers
+  PLANS ||--o{ PLAN_FEATURES : includes
+  APPLICATIONS ||--o{ SERVICE_TOKENS : authorizes
+  APPLICATIONS ||--o{ APPLICATION_ACCESS_LOGS : logs
+
+  CUSTOMERS ||--o{ SUBSCRIPTIONS : contracts
+  TENANTS ||--o{ SUBSCRIPTIONS : scopes
+  BRANCHES ||--o{ SUBSCRIPTIONS : scopes
+  APPLICATIONS ||--o{ SUBSCRIPTIONS : provides
+  PLANS ||--o{ SUBSCRIPTIONS : prices
+  SUBSCRIPTIONS ||--o{ SUBSCRIPTION_STATUS_HISTORY : tracks
+  SUBSCRIPTIONS ||--o{ SUBSCRIPTION_PLAN_CHANGES : changes
+
+  SUBSCRIPTIONS ||--o{ INVOICES : bills
+  INVOICES ||--o{ INVOICE_ITEMS : details
+  INVOICES ||--o{ PAYMENT_ALLOCATIONS : receives
+  PAYMENTS ||--o{ PAYMENT_ALLOCATIONS : applies
+  INVOICES ||--o{ PENALTIES : has
+  PENALTY_RULES ||--o{ PENALTIES : generates
+  SUBSCRIPTIONS ||--o{ SUBSCRIPTION_EXTENSIONS : extends
+  INVOICES ||--o{ SUBSCRIPTION_EXTENSIONS : extends
+
+  CUSTOMERS ||--o{ PAYMENTS : makes
+  CURRENCIES ||--o{ PLANS : prices
+  CURRENCIES ||--o{ INVOICES : denominates
+  CURRENCIES ||--o{ PAYMENTS : denominates
+  PAYMENT_METHODS ||--o{ PAYMENTS : uses
+
+  CUSTOMERS ||--o{ NOTIFICATIONS : receives
+  SUBSCRIPTIONS ||--o{ NOTIFICATIONS : triggers
+  INVOICES ||--o{ NOTIFICATIONS : triggers
+  USERS ||--o{ AUDIT_LOGS : performs
+  WEBHOOK_EVENTS ||--o{ PAYMENTS : may_create
+  JOB_EXECUTIONS ||--o{ NOTIFICATIONS : may_create

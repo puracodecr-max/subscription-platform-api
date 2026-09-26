@@ -5,3 +5,6 @@
 !**/.env.example
 npm-debug.log*
 .DS_Store
+
+# Frontend administrado en su propio repositorio Git
+/subscription-admin-web/
