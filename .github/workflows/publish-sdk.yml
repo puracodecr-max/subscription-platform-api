@@ -1,0 +1,65 @@
+name: Publish subscription SDK
+
+on:
+  push:
+    tags:
+      - 'sdk-v*'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: write
+
+concurrency:
+  group: publish-subscription-sdk
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: subscription-client-sdk
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: subscription-client-sdk/package-lock.json
+          registry-url: https://npm.pkg.github.com
+          scope: '@puracodecr-max'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run tests
+        run: npm test
+
+      - name: Verify tag version
+        if: github.ref_type == 'tag'
+        shell: bash
+        run: |
+          package_version="$(node -p "require('./package.json').version")"
+          tag_version="${GITHUB_REF_NAME#sdk-v}"
+          test "$package_version" = "$tag_version"
+
+      - name: Select npm distribution tag
+        id: npm-tag
+        shell: bash
+        run: |
+          package_version="$(node -p "require('./package.json').version")"
+          if [[ "$package_version" == *-* ]]; then
+            echo "value=beta" >> "$GITHUB_OUTPUT"
+          else
+            echo "value=latest" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Publish package
+        run: npm publish --tag "${{ steps.npm-tag.outputs.value }}"
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
