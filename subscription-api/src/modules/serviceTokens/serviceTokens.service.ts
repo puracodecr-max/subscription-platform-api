@@ -29,6 +29,18 @@ export async function getServiceTokenById(id: string) {
 }
 
 export function createServiceToken(input: CreateServiceTokenInput, actorId: string) {
+  if (input.expiresAt) {
+    const expiresAt = new Date(input.expiresAt);
+    if (expiresAt.getTime() <= Date.now()) {
+      throw new ApiError(
+        'Service token expiration date must be in the future',
+        400,
+        ErrorCodes.SERVICE_TOKEN_EXPIRES_AT_IN_PAST,
+        { field: 'expiresAt' }
+      );
+    }
+  }
+
   return serviceTokensRepository.createServiceToken(input, actorId);
 }
 

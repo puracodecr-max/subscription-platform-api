@@ -34,6 +34,15 @@ export function mapDatabaseError(error: unknown): ApiError {
   }
 
   if (error.code === '23514') {
+    if (error.constraint === 'service_tokens_not_expired_at_creation') {
+      return new ApiError(
+        'Service token expiration date must be in the future',
+        400,
+        ErrorCodes.SERVICE_TOKEN_EXPIRES_AT_IN_PAST,
+        { field: 'expiresAt' }
+      );
+    }
+
     return new ApiError('Database check constraint failed', 400, ErrorCodes.DATABASE_CHECK_VIOLATION);
   }
 
