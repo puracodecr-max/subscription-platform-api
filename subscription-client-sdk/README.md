@@ -5,6 +5,8 @@ Cliente TypeScript para validar acceso contra `subscription-api` desde backends 
 Version actual: `0.2.0-beta.1`. El paquete se distribuye de forma restringida mediante GitHub
 Packages.
 
+La operacion completa de publicacion, instalacion en Render, actualizaciones y rollback esta documentada en `documentation/SDK_GITHUB_PACKAGES.md`.
+
 ## Instalacion
 
 Configurar el registro y el token en el backend consumidor:
@@ -116,3 +118,5 @@ git push origin sdk-v0.2.0-beta.1
 ```
 
 Las versiones prerelease se publican con el tag npm `beta`; las estables usan `latest`.
+
+Para publicar nuevas versiones o configurar consumidores en Render, use la guia operativa `documentation/SDK_GITHUB_PACKAGES.md`.

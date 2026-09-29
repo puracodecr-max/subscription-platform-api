@@ -66,6 +66,8 @@ El SDK se instala usando una version exacta:
 npm install @puracodecr-max/subscription-client-sdk@0.2.0-beta.1
 ```
 
+El flujo completo de GitHub Packages, tokens, actualizaciones y rollback esta en `documentation/SDK_GITHUB_PACKAGES.md`.
+
 ## Reglas de despliegue
 
 - No subir archivos `.env`.

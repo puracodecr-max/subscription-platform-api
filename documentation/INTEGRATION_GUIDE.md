@@ -144,3 +144,5 @@ persistir la relacion usuario/tenant con `customerId` en vez de usar una variabl
 
 El modo abierto no ignora errores de credenciales, contexto o contrato. Solo permite continuar
 ante errores transitorios de red, timeout, rate limit o indisponibilidad `5xx`.
+
+La instalacion del paquete desde GitHub Packages, variables de Render y proceso de actualizacion estan documentados en `documentation/SDK_GITHUB_PACKAGES.md`.
