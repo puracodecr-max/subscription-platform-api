@@ -29,11 +29,11 @@ export async function getApplicationById(id: string): Promise<Application> {
 }
 
 export async function createApplication(input: CreateApplicationInput, actorId: string): Promise<Application> {
-  return applicationsRepository.createApplication(input, actorId);
+  return applicationsRepository.createApplication(normalizeApplicationInput(input), actorId);
 }
 
 export async function updateApplication(id: string, input: UpdateApplicationInput, actorId: string): Promise<Application> {
-  const application = await applicationsRepository.updateApplication(id, input, actorId);
+  const application = await applicationsRepository.updateApplication(id, normalizeApplicationInput(input), actorId);
 
   if (!application) {
     throw new ApiError('Application not found', 404, ErrorCodes.APPLICATION_NOT_FOUND);
@@ -46,4 +46,38 @@ export async function assertApplicationExists(id: string): Promise<void> {
   if (!(await applicationsRepository.applicationExists(id))) {
     throw new ApiError('Application not found', 404, ErrorCodes.APPLICATION_NOT_FOUND);
   }
+}
+
+function normalizeApplicationInput<T extends CreateApplicationInput | UpdateApplicationInput>(input: T): T {
+  if (input.modules === undefined) {
+    return input;
+  }
+
+  return {
+    ...input,
+    modules: normalizeModules(input.modules)
+  };
+}
+
+function normalizeModules(modules: Record<string, unknown>[]): Record<string, unknown>[] {
+  const seen = new Set<string>();
+  const normalizedModules: Record<string, unknown>[] = [];
+
+  for (const module of modules) {
+    const rawCode = typeof module.code === 'string' ? module.code : typeof module.name === 'string' ? module.name : '';
+    const code = rawCode.trim().toLowerCase();
+
+    if (!code || seen.has(code)) {
+      continue;
+    }
+
+    seen.add(code);
+    normalizedModules.push({
+      ...module,
+      code,
+      name: typeof module.name === 'string' && module.name.trim() ? module.name.trim() : code
+    });
+  }
+
+  return normalizedModules;
 }
