@@ -129,6 +129,26 @@ export async function validateEntitlement(input: ValidateEntitlementInput, conte
     return result;
   }
 
+  if (input.requestedModule && !applicationModules.includes(input.requestedModule)) {
+    const result = buildResult(
+      input,
+      application.id,
+      subscription.id,
+      subscription.status,
+      false,
+      'MODULE_NOT_INCLUDED',
+      null,
+      financialSummary.gracePeriodEnd,
+      outstandingBalance,
+      financialSummary.daysOverdue,
+      null,
+      applicationModules,
+      [input.requestedModule]
+    );
+    await record(input, context, result);
+    return result;
+  }
+
   const warningCode = getWarningCode(subscription.status, financialSummary);
   const result = buildResult(
     input,
