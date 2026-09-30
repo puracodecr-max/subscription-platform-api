@@ -9,6 +9,7 @@ const fallbackBlockedModules = ['operations'];
 
 export async function validateEntitlement(input: ValidateEntitlementInput, context: EntitlementContext): Promise<EntitlementValidationResult> {
   const application = await entitlementsRepository.findApplicationByCode(input.applicationCode);
+  const requestedModule = normalizeModuleCode(input.requestedModule);
 
   if (context.serviceTokenApplicationCode && context.serviceTokenApplicationCode !== input.applicationCode) {
     throw new ApiError('Service token is not authorized for this application', 403, ErrorCodes.FORBIDDEN_OPERATION);
@@ -129,7 +130,7 @@ export async function validateEntitlement(input: ValidateEntitlementInput, conte
     return result;
   }
 
-  if (input.requestedModule && !applicationModules.includes(input.requestedModule)) {
+  if (requestedModule && !applicationModules.includes(requestedModule)) {
     const result = buildResult(
       input,
       application.id,
@@ -143,7 +144,7 @@ export async function validateEntitlement(input: ValidateEntitlementInput, conte
       financialSummary.daysOverdue,
       null,
       applicationModules,
-      [input.requestedModule]
+      [requestedModule]
     );
     await record(input, context, result);
     return result;
@@ -207,19 +208,26 @@ function extractModuleCodes(value: unknown): string[] {
     return [];
   }
 
-  return value
+  const moduleCodes = value
     .map((item) => {
       if (typeof item === 'string') {
-        return item;
+        return normalizeModuleCode(item);
       }
 
       if (typeof item === 'object' && item !== null && 'code' in item && typeof item.code === 'string') {
-        return item.code;
+        return normalizeModuleCode(item.code);
       }
 
       return null;
     })
     .filter((item): item is string => Boolean(item));
+
+  return [...new Set(moduleCodes)];
+}
+
+function normalizeModuleCode(value: string | undefined): string | null {
+  const normalized = value?.trim().toLowerCase();
+  return normalized || null;
 }
 
 function blockedModules(applicationModules: string[]): string[] {
