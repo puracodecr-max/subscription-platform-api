@@ -43,6 +43,11 @@ export function mapDatabaseError(error: unknown): ApiError {
       );
     }
 
+    const checkConstraintError = mapCheckConstraintError(error.constraint);
+    if (checkConstraintError) {
+      return checkConstraintError;
+    }
+
     return new ApiError('Database check constraint failed', 400, ErrorCodes.DATABASE_CHECK_VIOLATION);
   }
 
@@ -55,6 +60,50 @@ export function mapDatabaseError(error: unknown): ApiError {
   }
 
   return new ApiError('Database operation failed');
+}
+
+function mapCheckConstraintError(constraint: string | undefined): ApiError | null {
+  if (constraint === 'plans_percentage_penalty_range') {
+    return new ApiError(
+      'Percentage penalty value must be between 0 and 100',
+      400,
+      ErrorCodes.PLAN_PERCENTAGE_PENALTY_OUT_OF_RANGE,
+      { field: 'penaltyValue', min: 0, max: 100 }
+    );
+  }
+
+  if (constraint === 'plans_price_non_negative') {
+    return new ApiError('Plan price must be greater than or equal to 0', 400, ErrorCodes.PLAN_PRICE_NEGATIVE, { field: 'price', min: 0 });
+  }
+
+  if (constraint === 'plans_grace_period_non_negative') {
+    return new ApiError(
+      'Grace period days must be greater than or equal to 0',
+      400,
+      ErrorCodes.PLAN_GRACE_PERIOD_NEGATIVE,
+      { field: 'gracePeriodDays', min: 0 }
+    );
+  }
+
+  if (constraint === 'plans_suspension_days_non_negative') {
+    return new ApiError(
+      'Suspension after due days must be greater than or equal to 0',
+      400,
+      ErrorCodes.PLAN_SUSPENSION_DAYS_NEGATIVE,
+      { field: 'suspensionAfterDueDays', min: 0 }
+    );
+  }
+
+  if (constraint === 'plans_penalty_value_non_negative') {
+    return new ApiError(
+      'Penalty value must be greater than or equal to 0',
+      400,
+      ErrorCodes.PLAN_PENALTY_VALUE_NEGATIVE,
+      { field: 'penaltyValue', min: 0 }
+    );
+  }
+
+  return null;
 }
 
 function mapBusinessRuleCode(code: string): ErrorCode {

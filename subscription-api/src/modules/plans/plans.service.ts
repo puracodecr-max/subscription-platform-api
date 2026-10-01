@@ -31,6 +31,7 @@ export async function getPlanById(id: string): Promise<Plan> {
 
 export async function createPlan(input: CreatePlanInput, actorId: string): Promise<Plan> {
   await assertApplicationExists(input.applicationId);
+  assertValidPlanPenalty(input);
   return plansRepository.createPlan(input, actorId);
 }
 
@@ -38,6 +39,14 @@ export async function updatePlan(id: string, input: UpdatePlanInput, actorId: st
   if (input.applicationId) {
     await assertApplicationExists(input.applicationId);
   }
+
+  const existingPlan = await plansRepository.getPlanById(id);
+
+  if (!existingPlan) {
+    throw new ApiError('Plan not found', 404, ErrorCodes.PLAN_NOT_FOUND);
+  }
+
+  assertValidPlanPenalty(input, existingPlan);
 
   const plan = await plansRepository.updatePlan(id, input, actorId);
 
@@ -51,5 +60,19 @@ export async function updatePlan(id: string, input: UpdatePlanInput, actorId: st
 export async function assertPlanMatchesApplication(planId: string, applicationId: string): Promise<void> {
   if (!(await plansRepository.planMatchesApplication(planId, applicationId))) {
     throw new ApiError('Plan does not belong to the selected application', 400, ErrorCodes.INVALID_PLAN_APPLICATION);
+  }
+}
+
+function assertValidPlanPenalty(input: CreatePlanInput | UpdatePlanInput, existingPlan?: Plan): void {
+  const penaltyType = input.penaltyType ?? existingPlan?.penaltyType ?? 'PERCENTAGE';
+  const penaltyValue = input.penaltyValue ?? existingPlan?.penaltyValue ?? '5';
+
+  if (penaltyType === 'PERCENTAGE' && Number(penaltyValue) > 100) {
+    throw new ApiError(
+      'Percentage penalty value must be between 0 and 100',
+      400,
+      ErrorCodes.PLAN_PERCENTAGE_PENALTY_OUT_OF_RANGE,
+      { field: 'penaltyValue', min: 0, max: 100 }
+    );
   }
 }
